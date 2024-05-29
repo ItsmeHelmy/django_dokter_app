@@ -1,0 +1,100 @@
+{% load static %}
+
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+      <!-- Brand Logo -->
+      <a href="{% url 'admin_home' %}" class="brand-link">
+        <img src="{% static 'dist/img/rsik.jpg' %}" alt="Logo RSIK" class="brand-image img-circle elevation-3"
+            style="opacity: .8">
+        <span class="brand-text font-weight-light">RSU ISLAM KLATEN</span>
+      </a>
+
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <!-- Sidebar user panel (optional) -->
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+          <div class="image">
+            <img src="{% static 'dist/img/user2-160x160.jpg' %}" class="img-circle elevation-2" alt="User Image">
+          </div>
+          <div class="info">
+            <a href="{% url 'dokter_profile' %}" class="d-block">dr. {{ user.first_name }} {{ user.last_name }}</a>
+          </div>
+        </div>
+
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+          <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+            <!-- Add icons to the links using the .nav-icon class
+                with font-awesome or any other icon font library -->
+            
+            <li class="nav-item">
+              {% url 'dokter_home' as dokter_home %}
+              <a href="{{ dokter_home }}" class="nav-link {% if request.path == dokter_home %} active {% endif %}">
+                <i class="nav-icon fas fa-house-user"></i>
+                <p>
+                  Beranda
+                  {% comment %} <span class="right badge badge-danger">New</span> {% endcomment %}
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              {% url 'dokter_take_attendance' as dokter_take_attendance %}
+              <a href="{{ dokter_take_attendance }}" class="nav-link {% if request.path == dokter_take_attendance %} active {% endif %}">
+                <i class="nav-icon fas fa-calendar-plus"></i>
+                <p>
+                  Ambil Presensi
+                  {% comment %} <span class="right badge badge-danger">New</span> {% endcomment %}
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              {% url 'dokter_update_attendance' as dokter_update_attendance %}
+              <a href="{{ dokter_update_attendance }}" class="nav-link {% if request.path == dokter_update_attendance %} active {% endif %}">
+                <i class="nav-icon far fa-calendar-check"></i>
+                <p>
+                  Lihat Update Presensi
+                  {% comment %} <span class="right badge badge-danger">New</span> {% endcomment %}
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              {% url 'dokter_view_attendance' as dokter_view_attendance %}
+              <a href="{{ dokter_view_attendance }}" class="nav-link {% if request.path == dokter_view_attendance %} active {% endif %}">
+                <i class="nav-icon fas fa-calendar-alt"></i>
+                <p>
+                  Lihat Presensi
+                  {% comment %} <span class="right badge badge-danger">New</span> {% endcomment %}
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              {% url 'dokter_apply_leave' as dokter_apply_leave %}
+              <a href="{{ dokter_apply_leave }}" class="nav-link {% if request.path == dokter_apply_leave %} active {% endif %}">
+                <i class="nav-icon fas fa-envelope-open-text"></i>
+                <p>
+                  Ajukan Izin
+                  {% comment %} <span class="right badge badge-danger">New</span> {% endcomment %}
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              {% url 'dokter_feedback' as dokter_feedback %}
+              <a href="{{ dokter_feedback }}" class="nav-link {% if request.path == dokter_feedback %} active {% endif %}">
+                <i class="nav-icon fas fa-comments"></i>
+                <p>
+                  Kirim Masukan
+                  {% comment %} <span class="right badge badge-danger">New</span> {% endcomment %}
+                </p>
+              </a>
+            </li>
+
+          </ul>
+        </nav>
+        <!-- /.sidebar-menu -->
+      </div>
+      <!-- /.sidebar -->
+    </aside>

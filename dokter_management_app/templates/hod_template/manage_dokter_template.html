@@ -1,0 +1,115 @@
+{% extends 'hod_template/base_template.html' %}
+
+{% block page_title %}
+    Kelola Dokter
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+{% load humanize %}
+<section class="content">
+        <div class="container-fluid">
+
+            <a class="btn btn-primary" href="{% url 'add_dokter' %}" role="button">Tambah Dokter +</a> <br/>&nbsp;
+            
+            {% if messages %}
+                                <div class="form-group">
+                                <div class="col-12">
+                                    {% for message in messages %}
+                                    {% if message.tags == "error" %}
+                                        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                        {{ message }}
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        </div>
+                                    {% elif message.tags == "success" %}
+                                        <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                        {{ message }}
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        </div>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                                </div>
+                                {% endif %}
+
+            <div class="row">
+
+                <div class="col-md-12">
+                    <!-- general form elements -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Detail Dokter</h3>
+
+                            <div class="card-tools">
+                            <div class="input-group input-group-sm" style="width: 150px;">
+                                <input type="text" name="table_search" id="searchInput" class="form-control float-right" placeholder="Search">
+
+                                <div class="input-group-append">
+                                    <button id="searchButton" class="btn btn-default"><i class="fas fa-search"></i></button>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        <!-- /.card-header -->
+                        <div class="card-body table-responsive p-0">
+                            <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                {% comment %} <th>ID</th> {% endcomment %}
+                                <th>Nama Dokter</th>
+                                <th>Profile Pic</th>
+                                {% comment %} <th>Username</th> {% endcomment %}
+                                {% comment %} <th>Email</th> {% endcomment %}
+                                <th>Alamat</th>
+                                <th>Besar Honor</th>
+                                <th>Gender</th>
+                                <th>Jabatan</th>
+                                <th>Tanggal diterima</th>
+                                <th>Periode Jaga</th>
+                                <th>Jadwal Jaga</th>
+                                <th>Last Login</th>
+                                <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dokter in dokters %}
+                                <tr>
+                                {% comment %} <td>{{ dokter.admin.id }}</td> {% endcomment %}
+                                <td>dr. {{dokter.admin.first_name }} {{dokter.admin.last_name}}</td>
+                                <td> <img src="{{ dokter.profile_pic }}" style="width: 75px;height: 75px" /> </td>
+                                {% comment %} <td>{{ dokter.admin.username }}</td> {% endcomment %
+                                {% comment %} <td>{{ dokter.admin.email }}</td> {% endcomment %}
+                                <td>{{ dokter.address }}</td>
+                                <td>Rp.{{ dokter.besar_honor|intcomma}}/jam</td>
+                                <td>{{ dokter.gender }}</td>
+                                <td>{{ dokter.jabatan }}</td>
+                                <td>{{ dokter.mulai_kerja}}</td>
+                                <td>{{ dokter.session_year_id.session_start_year }} s.d {{ dokter.session_year_id.session_end_year }}</td>
+                                <td>{{ dokter.course_id.course_name }}</td>
+                                <td>{{ dokter.admin.last_login|naturalday }}, {{ dokter.admin.last_login|naturaltime }}</td>
+                                <td>
+                                    <a href="{% url 'edit_dokter' dokter.admin.id %}" class="btn btn-success">Edit</a> 
+                                    <a href="{% url 'delete_dokter' dokter.admin.id %}" class="btn btn-danger">Hapus</a>
+                                </td>
+                                </tr>
+                                {% endfor %}
+                                
+                            </tbody>
+                            </table>
+                        </div>
+                        <!-- /.card-body -->
+                        </div>
+                    <!-- /.card -->
+
+                </div>
+            </div>
+
+        </div><!-- /.container-fluid -->
+    </section>
+
+{% endblock main_content %}

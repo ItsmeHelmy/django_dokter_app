@@ -1,0 +1,112 @@
+{% extends 'hod_template/base_template.html' %}
+
+{% block page_title %}
+    
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+{% load humanize%}
+{% load custom_filters %}
+<!-- Brand Logo -->
+        <img src="{% static 'dist/img/rsik.jpg' %}" alt="Logo RSIK" class="brand-image img-circle elevation-3" 
+        style="opacity: .8; height: 100px; margin: 10px">
+        <span class="brand-text font-weight-light" 
+        style="opacity: 1; font-size:25px;" > RUMAH SAKIT UMUM ISLAM KLATEN </span>
+        <br>
+
+        <span class="brand-text font-weight-light" 
+        style="opacity: .8; height: 150px; margin: 18px; font-size:15px" > Hal: Laporan Perhitungan honor jaga dokter umum </span> <br>
+        <span class="brand-text font-weight-light" 
+        style="opacity: .8; height: 150px; margin: 18px; font-size:15px" > Kepada: Kepada Bagian Akuntansi </span><br>
+        <span class="brand-text font-weight-light" 
+        style="opacity: 1; height: 150px; margin: 18px; font-size:15px" > <i>Assalamu 'alaikum wr. wb</i>, Berikut kami sampaikan perhitungan honor jaga dokter umum :  </span>
+
+<section class="content">
+        <div class="container-fluid">
+
+            {% comment %} <a class="btn btn-primary" href="{% url 'add_dokter' %}" role="button">+ Tambah Dokter</a> <br/>&nbsp; {% endcomment %}
+            
+            {% if messages %}
+                                <div class="form-group">
+                                <div class="col-12">
+                                    {% for message in messages %}
+                                    {% if message.tags == "error" %}
+                                        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                        {{ message }}
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        </div>
+                                    {% elif message.tags == "success" %}
+                                        <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                        {{ message }}
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        </div>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                                </div>
+                                {% endif %}
+
+            <div class="row">
+
+                <div class="col-md-12">
+                    <!-- general form elements -->
+                    <div class="card">
+                         <!-- <div class="card-header" style="margin-top:5px;> -->
+                            <!-- <h3 class="card-title">Detail Laporan Gaji</h3> -->
+
+                            <div class="card-tools">
+                            <div class="input-group input-group-sm" style="width: 150px;">
+
+                                <div class="input-group-append">
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        <!-- /.card-header -->
+                        <div class="card-body table-responsive p-0">
+                            <table class="table table-hover text-nowrap">
+                                <thead>
+                                    <tr>
+                                        <th>Nama Dokter</th>
+                                        <th>Jabatan</th>
+                                        <th>Tanggal diterima</th>
+                                        <th>Periode Jaga</th>
+                                        <th>Jadwal Jaga</th>
+                                        <th>Besar Honor</th>
+                                        <th>Jumlah Jam Jaga</th>
+                                        <th>Nominal Pembayaran</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for dokter in dokters %}
+                                    <tr>
+                                        <td>dr. {{ dokter.admin.first_name }} {{ dokter.admin.last_name }}</td>
+                                        <td>{{ dokter.jabatan }}</td>
+                                        <td>{{ dokter.mulai_kerja }}</td>
+                                        <td>{{ dokter.session_year_id.session_start_year }} s.d {{ dokter.session_year_id.session_end_year }}</td>
+                                        <td>{{ dokter.course_id.course_name }}</td>
+                                        <td>Rp.{{ dokter.besar_honor|intcomma }}/jam</td>
+                                        <td>{{ dokter_hours|get_item:dokter.id }} jam</td>
+                                        <td>Rp. {{ dokter.nominal_bayar|intcomma }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.card-body -->
+                        </div>
+                    <!-- /.card -->
+
+                </div>
+            </div>
+
+        </div><!-- /.container-fluid -->
+      </section>
+
+  {% endblock main_content %}

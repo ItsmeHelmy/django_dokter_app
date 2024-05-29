@@ -1,0 +1,65 @@
+{% extends 'hod_template/base_template.html' %}
+
+{% block page_title %}
+  Dashboard Admin
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+
+<section class="content">
+        <div class="container-fluid">
+          <!-- Small boxes (Stat box) -->
+          <div class="row">
+            <div class="col-lg-4 col-6">
+              <!-- small box -->
+              <div class="small-box bg-info">
+                <div class="inner">
+                  <h3>{{ all_dokter_count }}</h3>
+
+                  <p>Total Dokter</p>
+                </div>
+                <div class="icon">
+                  <i class="nav-icon fas fa-user-md"></i>
+                </div>
+                <a href="{% url 'manage_dokter' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              </div>
+            </div>
+
+            <div class="col-lg-4 col-6">
+              <!-- small box -->
+              <div class="small-box bg-warning">
+                <div class="inner">
+                  <h3>{{ course_count }}</h3>
+
+                  <p>Total Jadwal Jaga</p>
+                </div>
+                <div class="icon">
+                  <i class="fas fa-calendar-day"></i>
+                </div>
+                <a href="{% url 'manage_course' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              </div>
+            </div>
+            <!-- ./col -->
+            <div class="col-lg-4 col-6">
+              <!-- small box -->
+              <div class="small-box bg-success">
+                <div class="inner">
+                  <h3>{{ subject_count }}</h3>
+
+                  <p>Total Sesi Jaga</p>
+                </div>
+                <div class="icon">
+                  <i class="fas fa-calendar-alt"></i>
+                </div>
+                <a href="{% url 'manage_subject' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              </div>
+            </div>
+      </section>
+
+  {% endblock main_content %}
+
+  {% block custom_js %}
+
+  {% endblock custom_js %}
