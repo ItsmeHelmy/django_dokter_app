@@ -57,7 +57,7 @@
                 <div class="col-md-12">
                     <!-- general form elements -->
                     <div class="card">
-                         <!-- <div class="card-header" style="margin-top:5px;> -->
+                        <!-- <div class="card-header" style="margin-top:5px;> -->
                             <!-- <h3 class="card-title">Detail Laporan Gaji</h3> -->
 
                             <div class="card-tools">
@@ -69,13 +69,15 @@
                             </div>
                         </div>
                         <!-- /.card-header -->
-                        <div class="card-body table-responsive p-0">
-                            <table class="table table-hover text-nowrap">
+                        <div class="card-body table">
+                            <table class="table table-bordered">
                                 <thead>
-                                    <tr>
+                                    <tr  class="table-success">
+                                        <th>NIK</th>
                                         <th>Nama Dokter</th>
                                         <th>Jabatan</th>
                                         <th>Tanggal diterima</th>
+                                        <th>Masa Kerja</th>
                                         <th>Periode Jaga</th>
                                         <th>Jadwal Jaga</th>
                                         <th>Besar Honor</th>
@@ -86,10 +88,12 @@
                                 <tbody>
                                     {% for dokter in dokters %}
                                     <tr>
+                                        <td>{{ dokter.nik }}</td>
                                         <td>dr. {{ dokter.admin.first_name }} {{ dokter.admin.last_name }}</td>
                                         <td>{{ dokter.jabatan }}</td>
-                                        <td>{{ dokter.mulai_kerja }}</td>
-                                        <td>{{ dokter.session_year_id.session_start_year }} s.d {{ dokter.session_year_id.session_end_year }}</td>
+                                        <td>{{ dokter.mulai_kerja|date:'d F Y' }}</td>
+                                        <td>{{ dokter_dates|get_item:dokter.id|get_item:'years' }} Tahun {{ dokter_dates|get_item:dokter.id|get_item:'months' }} Bulan</td>
+                                        <td>{{ dokter.session_year_id.session_start_year|date:'d F Y' }} - {{ dokter.session_year_id.session_end_year|date:'d F Y' }}</td>
                                         <td>{{ dokter.course_id.course_name }}</td>
                                         <td>Rp.{{ dokter.besar_honor|intcomma }}/jam</td>
                                         <td>{{ dokter_hours|get_item:dokter.id }} jam</td>
@@ -107,6 +111,6 @@
             </div>
 
         </div><!-- /.container-fluid -->
-      </section>
+    </section>
 
-  {% endblock main_content %}
+{% endblock main_content %}

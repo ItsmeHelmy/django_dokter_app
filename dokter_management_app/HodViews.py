@@ -1,3 +1,4 @@
+from datetime import date
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib import messages
@@ -81,10 +82,10 @@ def add_course_save(request):
         try:
             course_model = Courses(course_name=course)
             course_model.save()
-            messages.success(request, "Course Added Successfully!")
+            messages.success(request, "Berhasil membuat jadwal jaga!")
             return redirect('add_course')
         except:
-            messages.error(request, "Failed to Add Course!")
+            messages.error(request, "Gagal membuat jadwal jaga!")
             return redirect('add_course')
 
 
@@ -117,11 +118,11 @@ def edit_course_save(request):
             course.course_name = course_name
             course.save()
 
-            messages.success(request, "Course Updated Successfully.")
+            messages.success(request, "Jadwal jaga berhasil diupdate.")
             return redirect('/edit_course/'+course_id)
 
         except:
-            messages.error(request, "Failed to Update Course.")
+            messages.error(request, "Jadwal jaga gagal diupdate.")
             return redirect('/edit_course/'+course_id)
 
 
@@ -129,10 +130,10 @@ def delete_course(request, course_id):
     course = Courses.objects.get(id=course_id)
     try:
         course.delete()
-        messages.success(request, "Course Deleted Successfully.")
+        messages.success(request, "Jadwal jaga berhasil dihapus.")
         return redirect('manage_course')
     except:
-        messages.error(request, "Failed to Delete Course.")
+        messages.error(request, "Jadwal jaga gagal dihapus.")
         return redirect('manage_course')
 
 
@@ -159,10 +160,10 @@ def add_session_save(request):
         try:
             sessionyear = SessionYearModel(session_start_year=session_start_year, session_end_year=session_end_year)
             sessionyear.save()
-            messages.success(request, "Session Year added Successfully!")
+            messages.success(request, "Berhasil membuat periode jaga!")
             return redirect("add_session")
         except:
-            messages.error(request, "Failed to Add Session Year")
+            messages.error(request, "Gagal membuat periode jaga")
             return redirect("add_session")
 
 
@@ -189,10 +190,10 @@ def edit_session_save(request):
             session_year.session_end_year = session_end_year
             session_year.save()
 
-            messages.success(request, "Session Year Updated Successfully.")
+            messages.success(request, "Periode jaga berhasil diupdate.")
             return redirect('/edit_session/'+session_id)
         except:
-            messages.error(request, "Failed to Update Session Year.")
+            messages.error(request, "Periode jaga gagal diupdate.")
             return redirect('/edit_session/'+session_id)
 
 
@@ -200,10 +201,10 @@ def delete_session(request, session_id):
     session = SessionYearModel.objects.get(id=session_id)
     try:
         session.delete()
-        messages.success(request, "Session Deleted Successfully.")
+        messages.success(request, "Periode jaga berhasil dihapus.")
         return redirect('manage_session')
     except:
-        messages.error(request, "Failed to Delete Session.")
+        messages.error(request, "Periode jaga gagal dihapus.")
         return redirect('manage_session')
 
 
@@ -225,6 +226,7 @@ def add_dokter_save(request):
             first_name = form.cleaned_data['first_name']
             last_name = form.cleaned_data['last_name']
             username = form.cleaned_data['username']
+            nik = form.cleaned_data['nik']
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
             address = form.cleaned_data['address']
@@ -249,6 +251,7 @@ def add_dokter_save(request):
             try:
                 user = CustomUser.objects.create_user(username=username, password=password, email=email, first_name=first_name, last_name=last_name, user_type=2)
                 
+                user.dokters.nik = nik
                 user.dokters.address = address
 
                 course_obj = Courses.objects.get(id=course_id)
@@ -273,9 +276,21 @@ def add_dokter_save(request):
 
 
 def manage_dokter(request):
-    dokters = Dokters.objects.all()
+    query = request.GET.get('search', '')
+    if query:
+        dokters = Dokters.objects.filter(
+            Q(admin__first_name__icontains=query) |
+            Q(admin__last_name__icontains=query) |
+            Q(admin__email__icontains=query) |
+            Q(jabatan__icontains=query) |
+            Q(address__icontains=query)
+        )
+    else:
+        dokters = Dokters.objects.all()
+
     context = {
-        "dokters": dokters
+        "dokters": dokters,
+        "search_query": query,
     }
     return render(request, 'hod_template/manage_dokter_template.html', context)
 
@@ -291,6 +306,7 @@ def edit_dokter(request, dokter_id):
     form.fields['username'].initial = dokter.admin.username
     form.fields['first_name'].initial = dokter.admin.first_name
     form.fields['last_name'].initial = dokter.admin.last_name
+    form.fields['nik'].initial = dokter.nik
     form.fields['address'].initial = dokter.address
     form.fields['besar_honor'].initial = dokter.besar_honor
     form.fields['course_id'].initial = dokter.course_id.id
@@ -320,6 +336,7 @@ def edit_dokter_save(request):
             username = form.cleaned_data['username']
             first_name = form.cleaned_data['first_name']
             last_name = form.cleaned_data['last_name']
+            nik = form.cleaned_data['nik']
             address = form.cleaned_data['address']
             course_id = form.cleaned_data['course_id']
             besar_honor = form.cleaned_data['besar_honor']
@@ -350,6 +367,7 @@ def edit_dokter_save(request):
 
                 # Then Update Dokter Table
                 dokter_model = Dokters.objects.get(admin=dokter_id)
+                dokter_model.nik = nik
                 dokter_model.address = address
 
                 course = Courses.objects.get(id=course_id)
@@ -406,10 +424,10 @@ def add_subject_save(request):
         try:
             subject = Subjects(subject_name=subject_name, course_id=course)
             subject.save()
-            messages.success(request, "Subject Added Successfully!")
+            messages.success(request, "Berhasil membuat sesi jaga!")
             return redirect('add_subject')
         except:
-            messages.error(request, "Failed to Add Subject!")
+            messages.error(request, "Gagal membuat sesi jaga!")
             return redirect('add_subject')
 
 
@@ -449,12 +467,12 @@ def edit_subject_save(request):
             
             subject.save()
 
-            messages.success(request, "Subject Updated Successfully.")
+            messages.success(request, "Sesi jaga berhasil diupdate.")
             # return redirect('/edit_subject/'+subject_id)
             return HttpResponseRedirect(reverse("edit_subject", kwargs={"subject_id":subject_id}))
 
         except:
-            messages.error(request, "Failed to Update Subject.")
+            messages.error(request, "Sesi jaga gagal diupdate.")
             return HttpResponseRedirect(reverse("edit_subject", kwargs={"subject_id":subject_id}))
             # return redirect('/edit_subject/'+subject_id)
 
@@ -464,10 +482,10 @@ def delete_subject(request, subject_id):
     subject = Subjects.objects.get(id=subject_id)
     try:
         subject.delete()
-        messages.success(request, "Subject Deleted Successfully.")
+        messages.success(request, "Sesi jaga berhasil dihapus.")
         return redirect('manage_subject')
     except:
-        messages.error(request, "Failed to Delete Subject.")
+        messages.error(request, "Sesi jaga gagal dihapus.")
         return redirect('manage_subject')
 
 
@@ -544,26 +562,49 @@ def admin_view_attendance(request):
     return render(request, "hod_template/admin_view_attendance.html", context)
 
 
+from datetime import date
+from django.db.models import Sum
+
 def admin_view_gaji(request):
     dokters = Dokters.objects.all()
     dokter_hours = {}
+    dokter_dates = {}
 
     for dokter in dokters:
-        total_hours = Attendance.objects.filter(
-            subject_id__course_id=dokter.course_id,
-            session_year_id=dokter.session_year_id
+        total_hours = AttendanceReport.objects.filter(
+            dokter_id=dokter,
+            attendance_id__subject_id__course_id=dokter.course_id,
+            attendance_id__session_year_id=dokter.session_year_id
         ).aggregate(Sum('hours_worked'))['hours_worked__sum'] or 0
         dokter_hours[dokter.id] = total_hours
 
         # Calculate besar_honor based on hours_worked
         dokter.nominal_bayar = total_hours * dokter.besar_honor  # Assuming besar_honor is a field in your Dokters model
 
+        # Calculate the difference between the current date and mulai_kerja
+        date1 = date.today()
+        date2 = dokter.mulai_kerja
+
+        # Calculate the difference between the two dates
+        delta = date1 - date2
+        
+        # Calculate the number of years and months
+        years = delta.days // 365
+        months = (delta.days % 365) // 30
+
+        # Store the calculated values in a dictionary
+        dokter_dates[dokter.id] = {
+            'years': years,
+            'months': months,
+            'mulai_kerja': date2
+        }
+
     context = {
         'dokters': dokters,
         'dokter_hours': dokter_hours,
+        'dokter_dates': dokter_dates
     }
     return render(request, 'hod_template/view_laporan_gaji.html', context)
-
 
 @csrf_exempt
 def admin_get_attendance_dates(request):

@@ -112,126 +112,105 @@
             </div>
 
         </div><!-- /.container-fluid -->
-      </section>
+    </section>
 
-  {% endblock main_content %}
+{% endblock main_content %}
 
 {% block custom_js %}
-
 <script>
-    $(document).ready(function(){
-        $("#fetch_dokter").click(function(){
-
-            // Displaying Dokters Based on Course and Session Enrolled
-
-            var subject=$("#subject").val()
-            var session_year=$("#session_year").val()
-
+    $(document).ready(function() {
+        $("#fetch_dokter").click(function() {
+            var subject = $("#subject").val();
+            var session_year = $("#session_year").val();
+    
             $.ajax({
-                url:'{% url 'get_dokters' %}',
-                type:'POST',
-                data:{subject:subject, session_year:session_year},
+                url: '{% url 'get_dokters' %}',
+                type: 'POST',
+                data: {
+                    subject: subject,
+                    session_year: session_year,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
             })
-
             .done(function(response) {
                 var json_data = JSON.parse(response);
                 console.log(json_data);
-                
-                // Displaying Attendance Date Input
+    
                 var div_data = "<div class='form-group'><label>Attendance Date: </label> <input type='date' name='attendance_date' id='attendance_date' class='form-control' /></div>";
-                div_data += "<div class='form-group'><label>Hours Worked (Jam): </label> <select class='form-control' name='hours_worked' id='hours_worked'> <option value='0.5'>0.5</option><option value='1.0'>1</option><option value='1.5'>1.5</option><option value='2.0'>2</option><option value='2.5'>2.5</option><option value='3.0'>3</option><option value='3.5'>3.5</option><option value='4.0'>4</option><option value='4.5'>4.5</option><option value='5.0'>5</option><option value='5.5'>5.5</option><option value='6.0'>6</option><option value='6.5'>6.5</option><option value='7.0'>7</option><option value='7.5'>7.5</option><option value='8.0'>8</option><option value='8.5'>8.5</option><option value='9.0'>9</option><option value='9.5'>9.5</option><option value='10.0'>10</option><option value='10.5'>10.5</option><option value='11.0'>11</option> </select></div>";
-
-                // Displaying Dokters Attendance
+    
                 div_data += "<div class='form-group'><div class='row'>";
-                
                 for (var key in json_data) {
-                    div_data += "<div class='col-lg-2'><div class='form-check'><input type='checkbox' name='dokter_data[]' value='" + json_data[key]['id'] + "' />  <label class='form-check-label'>" + json_data[key]['name'] + " </label></div></div>";
+                    div_data += "<div class='col-lg-2'><div class='form-check'><input type='checkbox' name='dokter_data[]' value='" + json_data[key]['id'] + "' class='dokter-checkbox' />  <label class='form-check-label'>" + json_data[key]['name'] + "</label>";
+                    div_data += "<select class='form-control hours_worked' name='hours_worked_ " + json_data[key]['id'] + "' id='hours_worked_" + json_data[key]['id'] + "' style='display: none;'>";
+                    for (var i = 0; i <= 11; i += 0.5) {
+                        div_data += "<option value='" + i + "'>" + i + "</option>";
+                    }
+                    div_data += "</select></div></div>";
                 }
-                
                 div_data += "</div></div>";
-                
-                // Save Attendance Button
+    
                 div_data += "<div class='form-group'><button id='save_attendance' class='btn btn-success' type='button'>Save Attendance Data</button></div>";
-                
-                // Updating the HTML content
+    
                 $("#dokter_data").html(div_data);
             })
             .fail(function() {
                 alert("Error in Fetching Dokters.");
             });
-
-            // Save Attendance Data to Database
-            $(document).on("click", "#save_attendance", function(){
-                
-                //Disabling the Button while data is being saved in Server
-                $(this).attr("disabled", "disabled")
-                $(this).text("Saving Attendance Data...")
-
-                //console.log("SAVE")
-                
-                /* FUNCTION BEFORE MODIFIED
-                var dokter_data=$("input[name='dokter_data[]'").map(function(){ 
-                        if($(this).is(":checked")){
-
-                            return {"id":$(this).val(), "status":1}; // Getting ID and Value of Dokters
-                        }
-                        else
-                        {
-                            return {"id":$(this).val(), "status":0}; // Getting ID and Value of Dokters
-                        }
-                    }).get()
-                var attendance_date=$("#attendance_date").val();
-                var subject_id=$("#subject").val();
-                var session_year_id=$("#session_year").val();
-                */
-                
-                var dokter_data = $("input[name='dokter_data[]']").map(function() {
+    
+            $(document).on("change", ".dokter-checkbox", function() {
+                var id = $(this).val();
+                if ($(this).is(":checked")) {
+                    $("#hours_worked_" + id).show();
+                } else {
+                    $("#hours_worked_" + id).hide();
+                }
+            });
+    
+            $(document).on("click", "#save_attendance", function() {
+                $(this).attr("disabled", "disabled");
+                $(this).text("Saving Attendance Data...");
+            
+                var dokter_data = [];
+                $(".dokter-checkbox").each(function() {
                     var isChecked = $(this).is(":checked");
                     var id = $(this).val();
                     var status = isChecked ? 1 : 0;
-                
-                    return {"id": id, "status": status};
-                }).get()
-                var attendance_date=$("#attendance_date").val();
-                var subject_id=$("#subject").val();
-                var session_year_id=$("#session_year").val();
-                var hours_worked=$("#hours_worked").val();
-                
-                //console.log(attendance_date)
-                //console.log(dokter_data);
-                dokter_data = JSON.stringify(dokter_data)
-
-                // Saving Attendance Data into Database
-
+                    var hours_worked = isChecked ? $("#hours_worked_" + id).val() : 0;
+                    dokter_data.push({"id": id, "status": status, "hours_worked": hours_worked});
+                });
+            
+                var attendance_date = $("#attendance_date").val();
+                var subject_id = $("#subject").val();
+                var session_year_id = $("#session_year").val();
+            
+                var data = {
+                    dokter_ids: JSON.stringify(dokter_data),
+                    attendance_date: attendance_date,
+                    subject_id: subject_id,
+                    session_year_id: session_year_id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                };
+            
                 $.ajax({
-                    url:'{% url 'save_attendance_data' %}',
-                    type:'POST',
-                    data:{dokter_ids:dokter_data, attendance_date:attendance_date, subject_id:subject_id, session_year_id:session_year_id, hours_worked:hours_worked},
+                    url: '{% url 'save_attendance_data' %}',
+                    type: 'POST',
+                    data: data,
                 })
-
-                
-                .done(function(response){
-                    
-                    if(response=="OK")
-                    {
-                        alert("Attendance Saved!")
+                .done(function(response) {
+                    if (response == "OK") {
+                        alert("Attendance Saved!");
+                    } else {
+                        alert("Failed to Save Attendance!");
                     }
-                    else
-                    {
-                        alert("Failed to Save Attendance!")
-                    }
-                    location.reload()
-                    
-                    //console.log(response)
+                    location.reload();
                 })
-
-                .fail(function(){
-                    alert("Error in Saving Dokters Attendance Data.")
-                })
-
-            })
-
-        })
-    })
+                .fail(function(jqXHR, textStatus, errorThrown) {
+                    alert("Error in Saving Dokters Attendance Data: " + textStatus + " - " + errorThrown);
+                    console.log(jqXHR.responseText);
+                });
+            });
+        });
+    });
+    
 </script>
 {% endblock custom_js %}

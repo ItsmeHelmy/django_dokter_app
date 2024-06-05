@@ -47,6 +47,7 @@ class Dokters(models.Model):
     id = models.AutoField(primary_key=True)
     admin = models.OneToOneField(CustomUser, on_delete = models.CASCADE)
     gender = models.CharField(max_length=50)
+    nik = models.CharField(max_length=50)
     profile_pic = models.FileField()
     address = models.TextField()
     course_id = models.ForeignKey(Courses, on_delete=models.DO_NOTHING, default=1)
@@ -64,7 +65,6 @@ class Attendance(models.Model):
     id = models.AutoField(primary_key=True)
     subject_id = models.ForeignKey(Subjects, on_delete=models.DO_NOTHING)
     attendance_date = models.DateField()
-    hours_worked = models.FloatField(null=True, default=0.0)
     session_year_id = models.ForeignKey(SessionYearModel, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -76,7 +76,7 @@ class AttendanceReport(models.Model):
     dokter_id = models.ForeignKey(Dokters, on_delete=models.DO_NOTHING)
     attendance_id = models.ForeignKey(Attendance, on_delete=models.CASCADE)
     status = models.BooleanField(default=False)
-    #hours_worked = models.FloatField(default=0.0)  # Add this field to store hours worked
+    hours_worked = models.FloatField(default=0.0)  # Add this field to store hours worked
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
@@ -84,7 +84,7 @@ class AttendanceReport(models.Model):
 class LeaveReportDokter(models.Model):
     id = models.AutoField(primary_key=True)
     dokter_id = models.ForeignKey(Dokters, on_delete=models.CASCADE)
-    leave_date = models.CharField(max_length=255)
+    leave_date = models.DateField()
     leave_message = models.TextField()
     leave_status = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)

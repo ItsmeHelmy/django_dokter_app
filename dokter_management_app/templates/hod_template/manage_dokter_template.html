@@ -43,16 +43,18 @@
                     <!-- general form elements -->
                     <div class="card">
                         <div class="card-header">
+                            
                             <h3 class="card-title">Detail Dokter</h3>
 
                             <div class="card-tools">
-                            <div class="input-group input-group-sm" style="width: 150px;">
-                                <input type="text" name="table_search" id="searchInput" class="form-control float-right" placeholder="Search">
-
-                                <div class="input-group-append">
-                                    <button id="searchButton" class="btn btn-default"><i class="fas fa-search"></i></button>
-                                </div>
-                            </div>
+                                <form method="GET" action="{% url 'manage_dokter' %}">
+                                    <div class="input-group input-group-sm" style="width: 150px;">
+                                        <input type="text" name="search" id="searchInput" class="form-control float-right" placeholder="Search" value="{{ search_query }}">
+                                        <div class="input-group-append">
+                                            <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                         <!-- /.card-header -->
@@ -62,6 +64,7 @@
                                 <tr>
                                 {% comment %} <th>ID</th> {% endcomment %}
                                 <th>Nama Dokter</th>
+                                <th>NIK</th>
                                 <th>Profile Pic</th>
                                 {% comment %} <th>Username</th> {% endcomment %}
                                 {% comment %} <th>Email</th> {% endcomment %}
@@ -81,6 +84,7 @@
                                 <tr>
                                 {% comment %} <td>{{ dokter.admin.id }}</td> {% endcomment %}
                                 <td>dr. {{dokter.admin.first_name }} {{dokter.admin.last_name}}</td>
+                                <td>{{dokter.nik}}</td>
                                 <td> <img src="{{ dokter.profile_pic }}" style="width: 75px;height: 75px" /> </td>
                                 {% comment %} <td>{{ dokter.admin.username }}</td> {% endcomment %
                                 {% comment %} <td>{{ dokter.admin.email }}</td> {% endcomment %}
@@ -88,8 +92,8 @@
                                 <td>Rp.{{ dokter.besar_honor|intcomma}}/jam</td>
                                 <td>{{ dokter.gender }}</td>
                                 <td>{{ dokter.jabatan }}</td>
-                                <td>{{ dokter.mulai_kerja}}</td>
-                                <td>{{ dokter.session_year_id.session_start_year }} s.d {{ dokter.session_year_id.session_end_year }}</td>
+                                <td>{{ dokter.mulai_kerja|date:'d F Y'}}</td>
+                                <td>{{ dokter.session_year_id.session_start_year|date:'d F Y'}} - {{ dokter.session_year_id.session_end_year|date:'d F Y'}}</td>
                                 <td>{{ dokter.course_id.course_name }}</td>
                                 <td>{{ dokter.admin.last_login|naturalday }}, {{ dokter.admin.last_login|naturaltime }}</td>
                                 <td>

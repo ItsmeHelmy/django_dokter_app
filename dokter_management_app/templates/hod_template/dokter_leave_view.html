@@ -40,9 +40,9 @@
                                     <td>{{ leave.id }}</td>
                                     <td>{{ leave.dokter_id.admin.id }}</td>
                                     <td>{{ leave.dokter_id.admin.first_name }} {{ feedback.dokter_id.admin.last_name }}</td> 
-                                    <td>{{ leave.leave_date }}</td>
+                                    <td>{{ leave.leave_date|date:'d F Y' }}</td>
                                     <td>{{ leave.leave_message }}</td>
-                                    <td>{{ leave.created_at|date:"d F Y, H:i:s" }}</td>
+                                    <td>{{ leave.created_at|date:'d F Y, H:i:s' }}</td>
                                     <td>
                                         {% if leave.leave_status == 0 %}
                                             <a href="{% url 'dokter_leave_approve' leave_id=leave.id %}" class="btn btn-success">Approve</a>

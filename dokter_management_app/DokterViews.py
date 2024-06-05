@@ -6,6 +6,9 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 import json
 import datetime # To Parse input DateTime into Python Date Time Object
+import logging
+
+logger = logging.getLogger(__name__)
 
 from dokter_management_app.models import CustomUser, SessionYearModel, Courses, Subjects, Dokters, Attendance, AttendanceReport, LeaveReportDokter, FeedBackDokter
 
@@ -115,40 +118,35 @@ def get_dokters(request):
 
     return JsonResponse(json.dumps(list_data), content_type="application/json", safe=False)
 
-
-
-
 @csrf_exempt
 def save_attendance_data(request):
-    # Get Values from Dokter Take Attendance form via AJAX (JavaScript)
-    # Use getlist to access HTML Array/List Input Data
-    dokter_ids = request.POST.get("dokter_ids")
-    subject_id = request.POST.get("subject_id")
-    attendance_date = request.POST.get("attendance_date")
-    session_year_id = request.POST.get("session_year_id")
-    hours_worked = request.POST.get('hours_worked')
-
-    subject_model = Subjects.objects.get(id=subject_id)
-    session_year_model = SessionYearModel.objects.get(id=session_year_id)
-
-    json_dokter = json.loads(dokter_ids)
-    # print(dict_dokter[0]['id'])
-
-    # print(dokter_ids)
     try:
+        # Get Values from Dokter Take Attendance form via AJAX (JavaScript)
+        dokter_ids = request.POST.get("dokter_ids")
+        subject_id = request.POST.get("subject_id")
+        attendance_date = request.POST.get("attendance_date")
+        session_year_id = request.POST.get("session_year_id")
+        hours_worked_data = request.POST.get("hours_worked")
+
+        subject_model = Subjects.objects.get(id=subject_id)
+        session_year_model = SessionYearModel.objects.get(id=session_year_id)
+
+        json_dokter = json.loads(dokter_ids)
+
         # First Attendance Data is Saved on Attendance Model
-        hours_worked = float(hours_worked)
-        attendance = Attendance(subject_id=subject_model, attendance_date=attendance_date, session_year_id=session_year_model, hours_worked=hours_worked)
+        attendance = Attendance(subject_id=subject_model, attendance_date=attendance_date, session_year_id=session_year_model)
         attendance.save()
 
         for stud in json_dokter:
-            # Attendance of Individual Dokter saved on AttendanceReport Model
             dokter = Dokters.objects.get(admin=stud['id'])
-            attendance_report = AttendanceReport(dokter_id=dokter, attendance_id=attendance, status=stud['status'])
+            hours_worked = stud['hours_worked']  # Get hours worked for each user
+            attendance_report = AttendanceReport(dokter_id=dokter, attendance_id=attendance, status=stud['status'], hours_worked=hours_worked)
             attendance_report.save()
+
         return HttpResponse("OK")
-    except:
-        return HttpResponse("Error")
+    except Exception as e:
+        logger.error(f"Error saving attendance data: {str(e)}", exc_info=True)
+        return HttpResponse(f"Error: {str(e)}")
 
 
 @csrf_exempt
@@ -170,7 +168,7 @@ def get_attendance_dates(request):
     list_data = []
 
     for attendance_single in attendance:
-        data_small={"id":attendance_single.id, "attendance_date":str(attendance_single.attendance_date), "session_year_id":attendance_single.session_year_id.id, "hours_worked":attendance_single.hours_worked}
+        data_small={"id":attendance_single.id, "attendance_date":str(attendance_single.attendance_date), "session_year_id":attendance_single.session_year_id.id}
         list_data.append(data_small)
 
     return JsonResponse(json.dumps(list_data), content_type="application/json", safe=False)
@@ -187,31 +185,35 @@ def get_attendance_dokter(request):
     list_data = []
 
     for dokter in attendance_data:
-        data_small={"id":dokter.dokter_id.admin.id, "name":dokter.dokter_id.admin.first_name+" "+dokter.dokter_id.admin.last_name, "status":dokter.status, "jumlah jam":dokter.attendance_id.hours_worked}
+        data_small={"id":dokter.dokter_id.admin.id, "name":dokter.dokter_id.admin.first_name+" "+dokter.dokter_id.admin.last_name, "status":dokter.status, "jumlah jam":dokter.hours_worked}
         list_data.append(data_small)
 
     return JsonResponse(json.dumps(list_data), content_type="application/json", safe=False)
 
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import Attendance, Dokters, AttendanceReport
+
 @csrf_exempt
 def update_attendance_data(request):
     try:
-        dokter_data = request.POST.get("dokter_data")
+        dokter_data = json.loads(request.POST.get("dokter_data"))
         attendance_date = request.POST.get("attendance_date")
-        hours_worked = request.POST.get("hours_worked")
 
-        if not dokter_data or not attendance_date or not hours_worked:
+        if not dokter_data or not attendance_date:
             return JsonResponse({"status": "error", "message": "Missing required parameters."})
 
         attendance = Attendance.objects.get(id=attendance_date)
-        attendance.hours_worked = hours_worked  # Update hours_worked in Attendance model
-        attendance.save()
 
-        json_dokter = json.loads(dokter_data)
-
-        for stud in json_dokter:
+        for stud in dokter_data:
             dokter = Dokters.objects.get(admin=stud['id'])
-            attendance_report = AttendanceReport.objects.get(dokter_id=dokter, attendance_id=attendance)
+            try:
+                attendance_report = AttendanceReport.objects.get(dokter_id=dokter, attendance_id=attendance)
+            except AttendanceReport.DoesNotExist:
+                attendance_report = AttendanceReport(dokter_id=dokter, attendance_id=attendance)
             attendance_report.status = stud['status']
+            attendance_report.hours_worked = stud['hours_worked'] if stud['status'] == 1 else 0
             attendance_report.save()
 
         return JsonResponse({"status": "OK"})
@@ -219,10 +221,9 @@ def update_attendance_data(request):
         return JsonResponse({"status": "error", "message": "Attendance record not found."})
     except Dokters.DoesNotExist:
         return JsonResponse({"status": "error", "message": "Dokter record not found."})
-    except AttendanceReport.DoesNotExist:
-        return JsonResponse({"status": "error", "message": "Attendance report not found."})
     except Exception as e:
         return JsonResponse({"status": "error", "message": str(e)})
+
 
 def dokter_apply_leave(request):
     dokter_obj = Dokters.objects.get(admin=request.user.id)

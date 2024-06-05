@@ -11,6 +11,7 @@ class AddDokterForm(forms.Form):
     first_name = forms.CharField(label="First Name", max_length=50, widget=forms.TextInput(attrs={"class":"form-control"}))
     last_name = forms.CharField(label="Last Name", max_length=50, widget=forms.TextInput(attrs={"class":"form-control"}))
     username = forms.CharField(label="Username", max_length=50, widget=forms.TextInput(attrs={"class":"form-control"}))
+    nik = forms.CharField(label="NIK", max_length=50, widget=forms.TextInput(attrs={"class":"form-control"}))
     address = forms.CharField(label="Address", max_length=50, widget=forms.TextInput(attrs={"class":"form-control"}))
     besar_honor = forms.IntegerField(label="Besar Honor", widget=forms.NumberInput(attrs={"class":"form-control"}))
 
@@ -36,8 +37,8 @@ class AddDokterForm(forms.Form):
         session_year_list = []
     
     gender_list = (
-        ('Male','Male'),
-        ('Female','Female')
+        ('Laki-laki','Laki-laki'),
+        ('Perempuan','Perempuan')
     )
     
     jabatan_list = (
@@ -78,6 +79,7 @@ class EditDokterForm(forms.Form):
     first_name = forms.CharField(label="First Name", max_length=50, widget=forms.TextInput(attrs={"class":"form-control"}))
     last_name = forms.CharField(label="Last Name", max_length=50, widget=forms.TextInput(attrs={"class":"form-control"}))
     username = forms.CharField(label="Username", max_length=50, widget=forms.TextInput(attrs={"class":"form-control"}))
+    nik = forms.CharField(label="NIK", max_length=50, widget=forms.TextInput(attrs={"class":"form-control"}))
     address = forms.CharField(label="Address", max_length=50, widget=forms.TextInput(attrs={"class":"form-control"}))
     besar_honor = forms.IntegerField(label="Besar Honor", widget=forms.NumberInput(attrs={"class":"form-control"}))
     
@@ -104,8 +106,8 @@ class EditDokterForm(forms.Form):
 
     
     gender_list = (
-        ('Male','Male'),
-        ('Female','Female')
+        ('Laki-laki','Laki-laki'),
+        ('Perempuan','Perempuan')
     )
 
     jabatan_list = (

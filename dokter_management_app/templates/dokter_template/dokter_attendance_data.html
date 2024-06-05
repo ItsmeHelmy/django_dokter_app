@@ -37,6 +37,8 @@
 
 {% block main_content %}
 
+{% load humanize %}
+
 {% load static %}
 
 <section class="content">
@@ -65,9 +67,9 @@
 
                                             Taken : {{attendance_report.attendance_id.created_at|date:'d F Y, H:m:s'}} <br/>
 
-                                            Updated : {{attendance_report.attendance_id.updated_at|date:'d F Y, H:m:s'}} <br/>
+                                            Updated : {{attendance_report.updated_at|naturaltime}} <br/>
 
-                                            Jumlah jam: <b>{{attendance_report.attendance_id.hours_worked}}</b> <br>
+                                            Jumlah jam: <b>{{attendance_report.hours_worked}}</b> jam<br>
                                             
                                                 <b>[ Status : Jaga ]</b>
                                             
